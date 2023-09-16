@@ -1,3 +1,6 @@
-## 0.0.1
+## [0.0.2] - 2023-09-16
 
-* TODO: Describe initial release.
+* Code refactoring.
+
+## [0.0.1] - 2023-09-14 
+* Initial release.

@@ -1,17 +1,16 @@
 library flogger;
 
-import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:isolate';
 
 class Flogger {
-  static const String TOP_LINE =
+  static const String _TOP_LINE =
       "┌────────────────────────────────────────────────────────────────────────────────────────";
-  static const String MIDDLE_LINE =
+  static const String _MIDDLE_LINE =
       "├────────────────────────────────────────────────────────────────────────────────────────";
-  static const String BOTTOM_LINE =
+  static const String _BOTTOM_LINE =
       "└────────────────────────────────────────────────────────────────────────────────────────";
-  static const String VERTICAL_DOUBLE_LINE = "│";
+  static const String _VERTICAL_DOUBLE_LINE = "│";
   static bool isLoggingEnabled = true;
   static String globalLogTag = " FloggerLogs";
 
@@ -45,19 +44,6 @@ class Flogger {
     }
   }
 
-  static String _formatJson(Object? json) {
-    try {
-      if (json is Map || json is List) {
-        return JsonEncoder.withIndent('  ').convert(json);
-      } else {
-        return json.toString();
-      }
-    } catch (e) {
-      e.toString();
-      return "An Error While Printing This Json: $e";
-    }
-  }
-
   static String _handleTag(String? customTag) {
     if (customTag != null && customTag.isNotEmpty) {
       return customTag;
@@ -74,11 +60,11 @@ class Flogger {
     final callerInfo = _extractCallerInformation(stackTrace);
     var logMessage = [
       " ",
-      TOP_LINE,
-      "$VERTICAL_DOUBLE_LINE Thread: ${Isolate.current.debugName}, Source:$callerInfo",
-      MIDDLE_LINE,
-      "$VERTICAL_DOUBLE_LINE ${msg.toString().split("\n").join("\n$VERTICAL_DOUBLE_LINE")}",
-      BOTTOM_LINE,
+      _TOP_LINE,
+      "$_VERTICAL_DOUBLE_LINE Thread: ${Isolate.current.debugName}, Source:$callerInfo",
+      _MIDDLE_LINE,
+      "$_VERTICAL_DOUBLE_LINE ${msg.toString().split("\n").join("\n$_VERTICAL_DOUBLE_LINE")}",
+      _BOTTOM_LINE,
     ].join("\n");
 
     _handlePrintMessage(level, logMessage, _handleTag(tag));
@@ -90,17 +76,17 @@ void _handlePrintMessage(FloggerLevel level, String msg, String tag) {
     case FloggerLevel.debug:
       developer.log(
         msg,
-        name: '🐛 [DEBUG]: ${tag}',
+        name: '🐛 [DEBUG]: $tag',
         time: DateTime.now(),
       );
       break;
     case FloggerLevel.info:
-      print('✨ [INFO]: ${tag}:${msg}');
+      print('✨ [INFO]: $tag:$msg');
       break;
     case FloggerLevel.error:
       developer.log(
         '',
-        name: '❌ [ERROR]: ${tag}',
+        name: '❌ [ERROR]: $tag',
         time: DateTime.now(),
         error: msg,
       );
@@ -109,7 +95,7 @@ void _handlePrintMessage(FloggerLevel level, String msg, String tag) {
     case FloggerLevel.warning:
       developer.log(
         '',
-        name: '⚠️ [WARNING]: ${tag}',
+        name: '⚠️ [WARNING]: $tag',
         time: DateTime.now(),
         error: msg,
       );
