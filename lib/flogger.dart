@@ -2,12 +2,11 @@ library flogger;
 
 import 'dart:developer' as developer;
 import 'dart:isolate';
-import 'dart:math';
 
 class Flogger {
-  static int _MAX_WIDTH = 150;
+  static const int _MAX_WIDTH = 150;
   static bool isLoggingEnabled = true;
-  static String globalLogTag = " FloggerLogs";
+  static String globalLogTag = " FloggerTag";
 
   static void d(Object? obj, {String? tag}) {
     if (Flogger.isLoggingEnabled) {
@@ -64,20 +63,20 @@ class Flogger {
     int maxWidth = allLines.fold(0, (int currentMax, line) => currentMax > line.length ? currentMax : line.length);
 
     // Constrói as linhas da caixa com base nessa largura
-    final topLine = "╔" + "═" * maxWidth + "╗";
-    final middleLine = "╟" + "─" * maxWidth + "╢";
-    final bottomLine = "╚" + "═" * maxWidth + "╝";
+    final topLine = "╔${"═" * maxWidth}╗";
+    final middleLine = "╟${"─" * maxWidth}╢";
+    final bottomLine = "╚${"═" * maxWidth}╝";
 
     // Cria a mensagem formatada
     var logMessage = [
       topLine,
-      "║" + threadInfo.padRight(maxWidth) + "║",
+      "║${threadInfo.padRight(maxWidth)}║",
       middleLine,
-      ...contentLines.map((line) => "║" + line.padRight(maxWidth) + "║"),
+      ...contentLines.map((line) => "║${line.padRight(maxWidth)}║"),
       bottomLine,
     ].join("\n");
 
-    _handlePrintMessage(level, "\n${logMessage}\n", _handleTag(tag));
+    _handlePrintMessage(level, "\n$logMessage\n", _handleTag(tag));
   }
 
   static List<String> splitLongLines(String line, int maxWidth) {
@@ -108,15 +107,15 @@ class Flogger {
           name: '❌ [ERROR]: $tag',
           time: DateTime.now(),
           error: msg,
+          stackTrace: StackTrace.current
         );
         break;
 
       case FloggerLevel.warning:
         developer.log(
-          '',
+          msg,
           name: '⚠️ [WARNING]: $tag',
           time: DateTime.now(),
-          error: msg,
         );
         break;
     }

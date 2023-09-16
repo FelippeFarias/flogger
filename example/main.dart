@@ -8,6 +8,9 @@ void main(){
 
   Flogger.e({"error":"msg error" , "status": 404});
 
+  /*
+  *
+  * */
   Flogger.i('Info Hello World!');
 
 }

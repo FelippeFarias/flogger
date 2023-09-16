@@ -1,3 +1,7 @@
+## [0.0.6]
+
+* Code refactoring and readme updating.
+
 ## [0.0.5]
 
 * Improved box appearance.
