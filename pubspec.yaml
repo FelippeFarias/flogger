@@ -1,6 +1,6 @@
 name: flogger
 description: Flogger is a simple yet powerful logging library for Dart applications. It supports various logging levels, such as debug, info, warning, and error, and provides beautifully formatted console output. This library is ideal for those who wish to keep track of activities within their application, find bugs, or monitor app performance.
-version: 0.0.3
+version: 0.0.4
 homepage: https://github.com/FelippeFarias/flogger.git
 
 environment:

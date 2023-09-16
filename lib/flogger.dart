@@ -57,7 +57,6 @@ class Flogger {
   static void _log(FloggerLevel level, String msg,
       {String? tag, StackTrace? stackTrace}) {
     stackTrace ??= StackTrace.current;
-    print(stackTrace);
     final callerInfo = _extractCallerInformation(stackTrace);
     var logMessage = [
       " ",
