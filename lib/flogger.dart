@@ -14,7 +14,7 @@ class Flogger {
   static bool isLoggingEnabled = true;
   static String globalLogTag = " FloggerLogs";
 
-  static void d(Object? obj, {String? tag, StackTrace? stackTrace}) {
+  static void d(Object? obj, {String? tag}) {
     if (Flogger.isLoggingEnabled) {
       _log(FloggerLevel.debug, obj.toString(), tag: tag);
     }
@@ -57,6 +57,7 @@ class Flogger {
   static void _log(FloggerLevel level, String msg,
       {String? tag, StackTrace? stackTrace}) {
     stackTrace ??= StackTrace.current;
+    print(stackTrace);
     final callerInfo = _extractCallerInformation(stackTrace);
     var logMessage = [
       " ",
@@ -104,15 +105,12 @@ void _handlePrintMessage(FloggerLevel level, String msg, String tag) {
 }
 
 String _extractCallerInformation(StackTrace stackTrace) {
-  final current = stackTrace.toString().split('\n');
-
-  for (int i = 0; i < current.length; i++) {
-    if (current[i].contains('package:flog_utils') &&
-        !current[i].contains('L.dart')) {
-      return current[i].trim();
+  final stackList = stackTrace.toString().split('\n');
+  for (String stack in stackList) {
+    if (!stack.contains('Flogger.')) {
+      return stack.trim(); // Remove espaços em branco
     }
   }
-
   return "Unknown source";
 }
 
