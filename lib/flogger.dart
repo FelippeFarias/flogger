@@ -2,15 +2,10 @@ library flogger;
 
 import 'dart:developer' as developer;
 import 'dart:isolate';
+import 'dart:math';
 
 class Flogger {
-  static const String _TOP_LINE =
-      "┌────────────────────────────────────────────────────────────────────────────────────────";
-  static const String _MIDDLE_LINE =
-      "├────────────────────────────────────────────────────────────────────────────────────────";
-  static const String _BOTTOM_LINE =
-      "└────────────────────────────────────────────────────────────────────────────────────────";
-  static const String _VERTICAL_DOUBLE_LINE = "│";
+  static int _MAX_WIDTH = 150;
   static bool isLoggingEnabled = true;
   static String globalLogTag = " FloggerLogs";
 
@@ -34,7 +29,7 @@ class Flogger {
 
   static void w(Object? obj, {String? tag}) {
     if (Flogger.isLoggingEnabled) {
-      _log(FloggerLevel.info, obj.toString(), tag: tag);
+      _log(FloggerLevel.warning, obj.toString(), tag: tag);
     }
   }
 
@@ -54,63 +49,88 @@ class Flogger {
     }
   }
 
-  static void _log(FloggerLevel level, String msg,
-      {String? tag, StackTrace? stackTrace}) {
+  static void _log(FloggerLevel level, String msg, {String? tag, StackTrace? stackTrace}) {
     stackTrace ??= StackTrace.current;
     final callerInfo = _extractCallerInformation(stackTrace);
+    final threadInfo = "Thread: ${Isolate.current.debugName}, Source: $callerInfo";
+
+    List<String> contentLines = msg.split("\n").expand((line) => splitLongLines(line, _MAX_WIDTH)).toList();
+
+    List<String> allLines = [
+      threadInfo,
+      ...contentLines
+    ];
+
+    int maxWidth = allLines.fold(0, (int currentMax, line) => currentMax > line.length ? currentMax : line.length);
+
+    // Constrói as linhas da caixa com base nessa largura
+    final topLine = "╔" + "═" * maxWidth + "╗";
+    final middleLine = "╟" + "─" * maxWidth + "╢";
+    final bottomLine = "╚" + "═" * maxWidth + "╝";
+
+    // Cria a mensagem formatada
     var logMessage = [
-      " ",
-      _TOP_LINE,
-      "$_VERTICAL_DOUBLE_LINE Thread: ${Isolate.current.debugName}, Source:$callerInfo",
-      _MIDDLE_LINE,
-      "$_VERTICAL_DOUBLE_LINE ${msg.toString().split("\n").join("\n$_VERTICAL_DOUBLE_LINE")}",
-      _BOTTOM_LINE,
+      topLine,
+      "║" + threadInfo.padRight(maxWidth) + "║",
+      middleLine,
+      ...contentLines.map((line) => "║" + line.padRight(maxWidth) + "║"),
+      bottomLine,
     ].join("\n");
 
-    _handlePrintMessage(level, logMessage, _handleTag(tag));
+    _handlePrintMessage(level, "\n${logMessage}\n", _handleTag(tag));
   }
-}
 
-void _handlePrintMessage(FloggerLevel level, String msg, String tag) {
-  switch (level) {
-    case FloggerLevel.debug:
-      developer.log(
-        msg,
-        name: '🐛 [DEBUG]: $tag',
-        time: DateTime.now(),
-      );
-      break;
-    case FloggerLevel.info:
-      print('✨ [INFO]: $tag:$msg');
-      break;
-    case FloggerLevel.error:
-      developer.log(
-        '',
-        name: '❌ [ERROR]: $tag',
-        time: DateTime.now(),
-        error: msg,
-      );
-      break;
-
-    case FloggerLevel.warning:
-      developer.log(
-        '',
-        name: '⚠️ [WARNING]: $tag',
-        time: DateTime.now(),
-        error: msg,
-      );
-      break;
+  static List<String> splitLongLines(String line, int maxWidth) {
+    List<String> lines = [];
+    while (line.length > maxWidth) {
+      lines.add(line.substring(0, maxWidth));
+      line = line.substring(maxWidth);
+    }
+    lines.add(line);
+    return lines;
   }
-}
 
-String _extractCallerInformation(StackTrace stackTrace) {
-  final stackList = stackTrace.toString().split('\n');
-  for (String stack in stackList) {
-    if (!stack.contains('Flogger.')) {
-      return stack.trim(); // Remove espaços em branco
+  static void _handlePrintMessage(FloggerLevel level, String msg, String tag) {
+    switch (level) {
+      case FloggerLevel.debug:
+        developer.log(
+          msg,
+          name: '🐛 [DEBUG]: $tag',
+          time: DateTime.now(),
+        );
+        break;
+      case FloggerLevel.info:
+        print('✨ [INFO]: $tag:$msg');
+        break;
+      case FloggerLevel.error:
+        developer.log(
+          '',
+          name: '❌ [ERROR]: $tag',
+          time: DateTime.now(),
+          error: msg,
+        );
+        break;
+
+      case FloggerLevel.warning:
+        developer.log(
+          '',
+          name: '⚠️ [WARNING]: $tag',
+          time: DateTime.now(),
+          error: msg,
+        );
+        break;
     }
   }
-  return "Unknown source";
+
+  static String _extractCallerInformation(StackTrace stackTrace) {
+    final stackList = stackTrace.toString().split('\n');
+    for (String stack in stackList) {
+      if (!stack.contains('Flogger.')) {
+        return stack.trim(); // Remove espaços em branco
+      }
+    }
+    return "Unknown source";
+  }
 }
 
 enum FloggerLevel {
