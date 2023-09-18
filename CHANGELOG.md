@@ -1,4 +1,8 @@
-## [0.0.6]
+## [0.0.8]
+
+* Singleton implemented.
+
+* ## [0.0.6]
 
 * Code refactoring and readme updating.
 
