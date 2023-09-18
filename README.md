@@ -34,9 +34,15 @@ import 'package:flogger/flogger.dart';
 Here are a few ways to use the library:
 
 ### Debug Log
+``` dart
+// Singleton
+  var log = Flogger();
+
+```
+
 
 ```dart
-Flogger.d(DateTime.now());
+log.d(DateTime.now());
 /*
 [🐛 [DEBUG]:  FloggerTag]
 ╔═════════════════════════════════════════════════════════════════════════════════════╗
@@ -50,7 +56,7 @@ Flogger.d(DateTime.now());
 ### Warning Log with Custom Tag
 
 ```dart
-Flogger.w("Warning message", tag: "WarningTag");
+log.w("Warning message", tag: "WarningTag");
 /*
 [️ [WARNING]: WarningTag]
 ╔═════════════════════════════════════════════════════════════════════════════════════╗
@@ -64,7 +70,7 @@ Flogger.w("Warning message", tag: "WarningTag");
 ### Error Log
 
 ```dart
-Flogger.e({"error":"msg error" , "status": 404});
+log.e({"error":"msg error" , "status": 404});
 /*
 [❌ [ERROR]:  FloggerLogs]
 ╔═══════════════════════════════════════════════════════════════════════════════════════╗
@@ -89,12 +95,7 @@ Flogger.e({"error":"msg error" , "status": 404});
 - `w(Object? obj, {String? tag})`: Logs a warning message.
 - `e(Object? obj, {String? tag})`: Logs an error message.
 
-### Internal Methods (not intended for public use)
-
-- `_log(FloggerLevel level, String msg, {String? tag, StackTrace? stackTrace})`: Main logging method which decides how the message is logged based on the log level.
-- `_handlePrintMessage(FloggerLevel level, String msg, String tag)`: Handles how the log messages are printed to the console.
-- `_extractCallerInformation(StackTrace stackTrace)`: Extracts the caller's information from the stack trace.
-
+ 
 ## Contributions
 
 Contributions, issues, and feature requests are welcome!

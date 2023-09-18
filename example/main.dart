@@ -1,16 +1,14 @@
 import 'package:flogger/flogger.dart'; 
 
 void main(){
+  var log = Flogger();
 
-  Flogger.d('Debug Hello World!');
+  log.d(DateTime.now());
 
-  Flogger.w('Warning Hello World!');
+  log.w('Warning Hello World!',tag: 'CustomTag');
 
-  Flogger.e({"error":"msg error" , "status": 404});
+  log.e({"error":"msg error" , "status": 404});
 
-  /*
-  *
-  * */
-  Flogger.i('Info Hello World!');
+  log.i('Info Hello World!');
 
 }

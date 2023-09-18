@@ -4,41 +4,49 @@ import 'dart:developer' as developer;
 import 'dart:isolate';
 
 class Flogger {
-  static const int _MAX_WIDTH = 150;
+  final int _MAX_WIDTH = 150;
   static bool isLoggingEnabled = true;
   static String globalLogTag = " FloggerTag";
 
-  static void d(Object? obj, {String? tag}) {
+  static final Flogger _instance = Flogger._internal();
+
+  factory Flogger() {
+    return _instance;
+  }
+
+  Flogger._internal();
+
+  void d(Object? obj, {String? tag}) {
     if (Flogger.isLoggingEnabled) {
       _log(FloggerLevel.debug, obj.toString(), tag: tag);
     }
   }
 
-  static void e(Object? obj, {String? tag}) {
+  void e(Object? obj, {String? tag}) {
     if (Flogger.isLoggingEnabled) {
       _log(FloggerLevel.error, obj.toString(), tag: tag);
     }
   }
 
-  static void i(Object? obj, {String? tag}) {
+  void i(Object? obj, {String? tag}) {
     if (Flogger.isLoggingEnabled) {
       _log(FloggerLevel.info, obj.toString(), tag: tag);
     }
   }
 
-  static void w(Object? obj, {String? tag}) {
+  void w(Object? obj, {String? tag}) {
     if (Flogger.isLoggingEnabled) {
       _log(FloggerLevel.warning, obj.toString(), tag: tag);
     }
   }
 
-  static void v(Object? obj, {String? tag}) {
+  void v(Object? obj, {String? tag}) {
     if (Flogger.isLoggingEnabled) {
       _log(FloggerLevel.info, obj.toString(), tag: tag);
     }
   }
 
-  static String _handleTag(String? customTag) {
+  String _handleTag(String? customTag) {
     if (customTag != null && customTag.isNotEmpty) {
       return customTag;
     } else if (Flogger.globalLogTag.isNotEmpty) {
@@ -48,19 +56,24 @@ class Flogger {
     }
   }
 
-  static void _log(FloggerLevel level, String msg, {String? tag, StackTrace? stackTrace}) {
+  void _log(FloggerLevel level, String msg,
+      {String? tag, StackTrace? stackTrace}) {
     stackTrace ??= StackTrace.current;
     final callerInfo = _extractCallerInformation(stackTrace);
-    final threadInfo = "Thread: ${Isolate.current.debugName}, Source: $callerInfo";
+    final threadInfo =
+        "Thread: ${Isolate.current.debugName}, Source: $callerInfo";
 
-    List<String> contentLines = msg.split("\n").expand((line) => splitLongLines(line, _MAX_WIDTH)).toList();
+    List<String> contentLines = msg
+        .split("\n")
+        .expand((line) => splitLongLines(line, _MAX_WIDTH))
+        .toList();
 
-    List<String> allLines = [
-      threadInfo,
-      ...contentLines
-    ];
+    List<String> allLines = [threadInfo, ...contentLines];
 
-    int maxWidth = allLines.fold(0, (int currentMax, line) => currentMax > line.length ? currentMax : line.length);
+    int maxWidth = allLines.fold(
+        0,
+        (int currentMax, line) =>
+            currentMax > line.length ? currentMax : line.length);
 
     // Constrói as linhas da caixa com base nessa largura
     final topLine = "╔${"═" * maxWidth}╗";
@@ -79,7 +92,7 @@ class Flogger {
     _handlePrintMessage(level, "\n$logMessage\n", _handleTag(tag));
   }
 
-  static List<String> splitLongLines(String line, int maxWidth) {
+  List<String> splitLongLines(String line, int maxWidth) {
     List<String> lines = [];
     while (line.length > maxWidth) {
       lines.add(line.substring(0, maxWidth));
@@ -89,7 +102,7 @@ class Flogger {
     return lines;
   }
 
-  static void _handlePrintMessage(FloggerLevel level, String msg, String tag) {
+  void _handlePrintMessage(FloggerLevel level, String msg, String tag) {
     switch (level) {
       case FloggerLevel.debug:
         developer.log(
@@ -102,13 +115,11 @@ class Flogger {
         print('✨ [INFO]: $tag:$msg');
         break;
       case FloggerLevel.error:
-        developer.log(
-          '',
-          name: '❌ [ERROR]: $tag',
-          time: DateTime.now(),
-          error: msg,
-          stackTrace: StackTrace.current
-        );
+        developer.log('',
+            name: '❌ [ERROR]: $tag',
+            time: DateTime.now(),
+            error: msg,
+            stackTrace: StackTrace.current);
         break;
 
       case FloggerLevel.warning:
@@ -121,7 +132,7 @@ class Flogger {
     }
   }
 
-  static String _extractCallerInformation(StackTrace stackTrace) {
+  String _extractCallerInformation(StackTrace stackTrace) {
     final stackList = stackTrace.toString().split('\n');
     for (String stack in stackList) {
       if (!stack.contains('Flogger.')) {
